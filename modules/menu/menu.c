@@ -189,8 +189,6 @@ static int dial_handler(struct re_printf *pf, void *arg)
 		err = ua_connect(pf, uag_cur(), NULL, NULL,
 				 carg->prm, NULL, VIDMODE_ON);
 
-		// (void)re_hprintf(pf, "call: connecting to '%s'..\n", call_peeruri(ua_call(uag_cur())));
-
 	}
 	else if (dialbuf->end > 0) {
 
