@@ -544,7 +544,7 @@ int call_alloc(struct call **callp, const struct config *cfg, struct list *lst,
 }
 
 
-int call_connect(struct call *call, const struct pl *paddr)
+int call_connect(struct re_printf *pf, struct call *call, const struct pl *paddr)
 {
 	struct sip_addr addr;
 	int err;
@@ -552,7 +552,7 @@ int call_connect(struct call *call, const struct pl *paddr)
 	if (!call || !paddr)
 		return EINVAL;
 
-	// info("call: connecting to '%r'..\n", paddr);
+	(void)re_hprintf(pf, "call: connecting to '%r'..\n", paddr);
 
 	/* if the peer-address is a full SIP address then we need
 	 * to parse it and extract the SIP uri part.
@@ -826,7 +826,7 @@ int call_rtp_stats(struct re_printf *pf, const struct call *call)
 
 	if (call->config_avt.rtp_stats) {
 
-	err = re_hprintf(pf, "RTP Statistics:%H\r\n",
+	err = re_hprintf(pf, "%H\r\n",
                          audio_print_rtp_stats, call->audio);
 
 	}

@@ -186,10 +186,10 @@ static int dial_handler(struct re_printf *pf, void *arg)
 		mbuf_rewind(dialbuf);
 		(void)mbuf_write_str(dialbuf, carg->prm);
 
-		err = ua_connect(uag_cur(), NULL, NULL,
+		err = ua_connect(pf, uag_cur(), NULL, NULL,
 				 carg->prm, NULL, VIDMODE_ON);
 
-		(void)re_hprintf(pf, "call: connecting to '%s'..\n", call_peeruri(ua_call(uag_cur())));
+		// (void)re_hprintf(pf, "call: connecting to '%s'..\n", call_peeruri(ua_call(uag_cur())));
 
 	}
 	else if (dialbuf->end > 0) {
@@ -201,7 +201,7 @@ static int dial_handler(struct re_printf *pf, void *arg)
 		if (err)
 			return err;
 
-		err = ua_connect(uag_cur(), NULL, NULL, uri, NULL, VIDMODE_ON);
+		err = ua_connect(pf, uag_cur(), NULL, NULL, uri, NULL, VIDMODE_ON);
 
 		(void)re_hprintf(pf, "call: connecting to '%s'..\n", uri);
 

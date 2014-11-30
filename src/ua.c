@@ -337,7 +337,8 @@ static void call_event_handler(struct call *call, enum call_event ev,
 
 			pl_set_str(&pl, str);
 
-			err = call_connect(call2, &pl);
+			// HACK
+			err = call_connect(NULL, call2, &pl);
 			if (err) {
 				warning("ua: transfer: connect error: %m\n",
 					err);
@@ -644,7 +645,7 @@ static int uri_complete(struct ua *ua, struct mbuf *buf, const char *uri)
  *
  * @return 0 if success, otherwise errorcode
  */
-int ua_connect(struct ua *ua, struct call **callp,
+int ua_connect(struct re_printf *pf, struct ua *ua, struct call **callp,
 	       const char *from_uri, const char *uri,
 	       const char *params, enum vidmode vmode)
 {
@@ -685,7 +686,7 @@ int ua_connect(struct ua *ua, struct call **callp,
 	pl.p = (char *)dialbuf->buf;
 	pl.l = dialbuf->end;
 
-	err = call_connect(call, &pl);
+	err = call_connect(pf, call, &pl);
 
 	if (err)
 		mem_deref(call);
