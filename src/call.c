@@ -324,23 +324,9 @@ static int update_media(struct call *call)
 }
 
 
-static void print_summary(const struct call *call)
-{
-	uint32_t dur = call_duration(call);
-	if (!dur)
-		return;
-
-	re_printf("%s: Call with %s terminated (duration: %H)\n",
-	     call->local_uri, call->peer_uri, fmt_human_time, &dur);
-}
-
-
 static void call_destructor(void *arg)
 {
 	struct call *call = arg;
-
-	// if (call->state != STATE_IDLE)
-		// print_summary(call);
 
 	call_stream_stop(call);
 	list_unlink(&call->le);
