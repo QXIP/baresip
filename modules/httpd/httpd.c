@@ -95,6 +95,22 @@ static void http_req_handler(struct http_conn *conn,
 }
 
 
+static int output_handler(const char *str)
+{
+	(void)str;
+
+	/* TODO: print 'str' to all active HTTP connections */
+
+	return 0;
+}
+
+
+static struct ui ui_http = {
+	.name = "http",
+	.outputh = output_handler
+};
+
+
 static int module_init(void)
 {
 	struct sa laddr;
@@ -108,6 +124,8 @@ static int module_init(void)
 	if (err)
 		return err;
 
+	ui_register(&ui_http);
+
 	info("httpd: listening on %J\n", &laddr);
 
 	return 0;
@@ -116,6 +134,8 @@ static int module_init(void)
 
 static int module_close(void)
 {
+	ui_unregister(&ui_http);
+
 	httpsock = mem_deref(httpsock);
 
 	return 0;
