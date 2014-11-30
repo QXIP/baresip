@@ -817,6 +817,23 @@ int call_debug(struct re_printf *pf, const struct call *call)
 	return err;
 }
 
+int call_rtp_stats(struct re_printf *pf, const struct call *call)
+{
+	int err;
+
+	if (!call)
+		return 0;
+
+	if (call->config_avt.rtp_stats) {
+
+	err = re_hprintf(pf, "RTP Statistics:\n %H\r\n",
+                         audio_print_rtp_stats, call->audio);
+
+	}
+
+	return err;
+}
+
 
 static int print_duration(struct re_printf *pf, const struct call *call)
 {

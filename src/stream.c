@@ -37,44 +37,9 @@ static inline int lostcalc(struct stream *s, uint16_t seq)
 }
 
 
-static void print_rtp_stats(const struct stream *s)
-{
-	bool started = s->metric_tx.n_packets>0 || s->metric_rx.n_packets>0;
-
-	if (!started)
-		return;
-
-	info("\n%-9s       Transmit:     Receive:\n"
-	     "packets:        %7u      %7u\n"
-	     "avg. bitrate:   %7.1f      %7.1f  (kbit/s)\n"
-	     "errors:         %7d      %7d\n"
-	     ,
-	     sdp_media_name(s->sdp),
-	     s->metric_tx.n_packets, s->metric_rx.n_packets,
-	     1.0*metric_avg_bitrate(&s->metric_tx)/1000,
-	     1.0*metric_avg_bitrate(&s->metric_rx)/1000,
-	     s->metric_tx.n_err, s->metric_rx.n_err
-	     );
-
-	if (s->rtcp_stats.tx.sent || s->rtcp_stats.rx.sent) {
-
-		info("pkt.report:     %7u      %7u\n"
-		     "lost:           %7d      %7d\n"
-		     "jitter:         %7.1f      %7.1f  (ms)\n",
-		     s->rtcp_stats.tx.sent, s->rtcp_stats.rx.sent,
-		     s->rtcp_stats.tx.lost, s->rtcp_stats.rx.lost,
-		     1.0*s->rtcp_stats.tx.jit/1000,
-		     1.0*s->rtcp_stats.rx.jit/1000);
-	}
-}
-
-
 static void stream_destructor(void *arg)
 {
 	struct stream *s = arg;
-
-	if (s->cfg.rtp_stats)
-		print_rtp_stats(s);
 
 	metric_reset(&s->metric_tx);
 	metric_reset(&s->metric_rx);

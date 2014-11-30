@@ -1457,3 +1457,59 @@ int audio_print_rtpstat(struct re_printf *pf, const struct audio *a)
 
 	return err;
 }
+
+int audio_print_rtp_stats(struct re_printf *pf, const struct audio *a)
+{
+	const struct stream *s;
+	const struct rtcp_stats *rtcp;
+	int srate_tx = 8000;
+	int srate_rx = 8000;
+	int err;
+
+	if (!a)
+		return 1;
+
+	s = a->strm;
+	rtcp = &s->rtcp_stats;
+
+	if (!rtcp->tx.sent)
+		return 1;
+
+	if (a->tx.ac)
+		srate_tx = get_srate(a->tx.ac);
+	if (a->rx.ac)
+		srate_rx = get_srate(a->rx.ac);
+
+
+	err = re_hprintf(pf,
+	     "\n%-9s       Transmit:     Receive:\n"
+             "packets:        %7u      %7u\n"
+             "avg. bitrate:   %7.1f      %7.1f  (kbit/s)\n"
+             "errors:         %7d      %7d\n"
+             ,
+             sdp_media_name(s->sdp),
+             s->metric_tx.n_packets, s->metric_rx.n_packets,
+             1.0*metric_avg_bitrate(&s->metric_tx)/1000,
+             1.0*metric_avg_bitrate(&s->metric_rx)/1000,
+             s->metric_tx.n_err, s->metric_rx.n_err
+             );
+	if (s->rtcp_stats.tx.sent || s->rtcp_stats.rx.sent) {
+	     err = re_hprintf(pf,
+		     "pkt.report:     %7u      %7u\n"
+                     "lost:           %7d      %7d\n"
+                     "jitter:         %7.1f      %7.1f  (ms)\n",
+                     s->rtcp_stats.tx.sent, s->rtcp_stats.rx.sent,
+                     s->rtcp_stats.tx.lost, s->rtcp_stats.rx.lost,
+                     1.0*s->rtcp_stats.tx.jit/1000,
+                     1.0*s->rtcp_stats.rx.jit/1000);
+	}
+
+	if (a->tx.ac) {
+		err |= re_hprintf(pf, "Encoder:     %s/%d \n", a->tx.ac->name, srate_tx );
+	}
+	if (a->rx.ac) {
+		err |= re_hprintf(pf, "Decoder:     %s/%d \n", a->rx.ac->name, srate_rx );
+	}
+
+	return err;
+}

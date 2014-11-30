@@ -306,6 +306,8 @@ static int cmd_hangup(struct re_printf *pf, void *unused)
 	(void)re_hprintf(pf, "%s: Call with %s terminated (duration: %H)\n",
              call_localuri(call), call_peeruri(call), fmt_human_time, &dur);
 
+	call_rtp_stats(pf, call);
+
 	ua_hangup(uag_cur(), NULL, 0, NULL);
 
 	/* note: must be called after ua_hangup() */
