@@ -330,7 +330,7 @@ static void print_summary(const struct call *call)
 	if (!dur)
 		return;
 
-	info("%s: Call with %s terminated (duration: %H)\n",
+	re_printf("%s: Call with %s terminated (duration: %H)\n",
 	     call->local_uri, call->peer_uri, fmt_human_time, &dur);
 }
 
@@ -339,8 +339,8 @@ static void call_destructor(void *arg)
 {
 	struct call *call = arg;
 
-	if (call->state != STATE_IDLE)
-		print_summary(call);
+	// if (call->state != STATE_IDLE)
+		// print_summary(call);
 
 	call_stream_stop(call);
 	list_unlink(&call->le);
@@ -566,7 +566,7 @@ int call_connect(struct call *call, const struct pl *paddr)
 	if (!call || !paddr)
 		return EINVAL;
 
-	info("call: connecting to '%r'..\n", paddr);
+	// info("call: connecting to '%r'..\n", paddr);
 
 	/* if the peer-address is a full SIP address then we need
 	 * to parse it and extract the SIP uri part.

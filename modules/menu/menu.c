@@ -7,7 +7,6 @@
 #include <re.h>
 #include <baresip.h>
 
-
 /** Defines the status modes */
 enum statmode {
 	STATMODE_CALL = 0,
@@ -22,7 +21,6 @@ static struct tmr tmr_stat;           /**< Call status timer              */
 static enum statmode statmode;        /**< Status mode                    */
 static struct mbuf *dialbuf;          /**< Buffer for dialled number      */
 static struct le *le_cur;             /**< Current User-Agent (struct ua) */
-
 
 static void menu_set_incall(bool incall);
 static void update_callstatus(void);
@@ -190,6 +188,9 @@ static int dial_handler(struct re_printf *pf, void *arg)
 
 		err = ua_connect(uag_cur(), NULL, NULL,
 				 carg->prm, NULL, VIDMODE_ON);
+
+		(void)re_hprintf(pf, "call: connecting to '%s'..\n", call_peeruri(ua_call(uag_cur())));
+
 	}
 	else if (dialbuf->end > 0) {
 
@@ -202,11 +203,14 @@ static int dial_handler(struct re_printf *pf, void *arg)
 
 		err = ua_connect(uag_cur(), NULL, NULL, uri, NULL, VIDMODE_ON);
 
+		(void)re_hprintf(pf, "call: connecting to '%s'..\n", uri);
+
 		mem_deref(uri);
 	}
 
 	if (err) {
 		warning("menu: ua_connect failed: %m\n", err);
+		(void)re_hprintf(pf, "menu: ua_connect failed: '%m'..\n", err);
 	}
 
 	return err;
@@ -290,8 +294,17 @@ static int cmd_answer(struct re_printf *pf, void *unused)
 
 static int cmd_hangup(struct re_printf *pf, void *unused)
 {
+	struct call *call;
+	uint32_t dur;
+
 	(void)pf;
 	(void)unused;
+
+	call = ua_call(uag_cur());
+	dur = call_duration(call);
+
+	(void)re_hprintf(pf, "%s: Call with %s terminated (duration: %H)\n",
+             call_localuri(call), call_peeruri(call), fmt_human_time, &dur);
 
 	ua_hangup(uag_cur(), NULL, 0, NULL);
 
