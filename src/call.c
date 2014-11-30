@@ -826,7 +826,7 @@ int call_rtp_stats(struct re_printf *pf, const struct call *call)
 
 	if (call->config_avt.rtp_stats) {
 
-	err = re_hprintf(pf, "RTP Statistics:\n %H\r\n",
+	err = re_hprintf(pf, "RTP Statistics:%H\r\n",
                          audio_print_rtp_stats, call->audio);
 
 	}
